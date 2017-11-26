@@ -22,17 +22,19 @@ x_train /= 255
 x_test /= 255
 
 input_layer = Input(shape=input_shape)
-first_layer = Conv2D(28, 3, activation='relu', input_shape=input_shape)(input_layer)
-hidden = Conv2D(56, 3, activation='relu')(first_layer)
+hidden = Conv2D(28, 3, activation='relu', input_shape=input_shape)(input_layer)
+hidden = Conv2D(28, 3, activation='relu')(hidden)
 hidden = Dropout(0.25)(hidden)
 hidden = Flatten()(hidden)
-hidden = Dense(100, activation='sigmoid')(hidden)
-hidden = Dense(50, activation='sigmoid')(hidden)
-output = Dense(10, activation='sigmoid')(hidden)
+output = Dense(10, activation='softmax')(hidden)
 
 mlp = Model(inputs=input_layer, outputs=output)
-mlp.compile(optimizer=optimizers.Adam(lr=0.01), loss='mse', metrics=['accuracy'])
+mlp.compile(optimizer=optimizers.Adam(lr=0.005), loss='mse', metrics=['accuracy'])
 
 mlp.summary()
 
 mlp.fit(x_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE, shuffle=True, verbose=2)
+
+score = mlp.evaluate(x_test, y_test, verbose=0)
+print('Test loss:', score[0])
+print('Test accuracy:', score[1])
